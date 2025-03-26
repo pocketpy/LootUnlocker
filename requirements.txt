@@ -2,3 +2,4 @@ fastapi
 psycopg[binary]
 redis
 uvicorn
+sqlmodel
