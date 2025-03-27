@@ -1,12 +1,16 @@
 from datetime import datetime
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel
 from sqlalchemy.dialects.postgresql import JSONB, JSON
+
+from loot_unlocker.env import get_sql_engine
+
+from threading import get_ident
 
 ImageToken = str
 
 def new_session():
-    engine = create_engine(...)
-    return Session(engine)
+    tid = get_ident()
+    return Session(get_sql_engine(tid))
 
 
 class Project(SQLModel, table=True):
