@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, Request
+from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlmodel import select
 
 from loot_unlocker.middlewares import get_current_player
-from loot_unlocker.models.db import Player, Save, new_session
+from loot_unlocker.models import db
 
 router = APIRouter(
     prefix="/api/save",
@@ -17,9 +18,9 @@ class UploadSaveInput(BaseModel):
 
 @router.post("/")
 async def upload_save(request: Request, params: UploadSaveInput):
-    player: Player = request.state.player
-    with new_session() as session:
-        sql = select(Save).where(Save.key == params.key)
+    player: db.Player = request.state.player
+    with db.new_session() as session:
+        sql = select(db.Save).where(db.Save.key == params.key)
         save = session.exec(sql).first()
         if save is not None:
             # update
@@ -27,7 +28,7 @@ async def upload_save(request: Request, params: UploadSaveInput):
             save.extras = params.extras
         else:
             # insert
-            save = Save(
+            save = db.Save(
                 player_id=player.id,
                 key=params.key,
                 data=params.data,
@@ -37,14 +38,50 @@ async def upload_save(request: Request, params: UploadSaveInput):
             session.add(save)
         session.commit()
 
+@router.get("/{key}")
+async def download_save(request: Request, key: str):
+    player: db.Player = request.state.player
+    with db.new_session() as session:
+        sql = select(db.Save).where(db.Save.player_id == player.id, db.Save.key == key)
+        save = session.exec(sql).first()
+        if save is None:
+            raise HTTPException(404)
+        if save.player_id != player.id:
+            raise HTTPException(403)
+        return save
 
-def download_save():
-    pass
 
+class ListSaveOutput(BaseModel):
+    key: str
+    project_version: int
+    extras: dict
+    created_at: datetime
+    updated_at: datetime
 
-def list_saves():
-    pass
+@router.get("/")
+async def list_save(request: Request, limit: int = 20, offset: int = 0):
+    player: db.Player = request.state.player
+    with db.new_session() as session:
+        sql = select(db.Save).where(db.Save.player_id == player).limit(limit).offset(offset)
+        saves = session.exec(sql).all()
+        return [
+            ListSaveOutput(
+                key=save.key,
+                project_version=save.project_version,
+                extras=save.extras,
+                created_at=save.created_at,
+                updated_at=save.updated_at
+            )
+            for save in saves
+        ]
 
-
-def delete_save():
-    pass
+@router.delete("/{key}")
+async def delete_save(request: Request, key: str):
+    player: db.Player = request.state.player
+    with db.new_session() as session:
+        sql = select(db.Save).where(db.Save.player_id == player.id, db.Save.key == key)
+        save = session.exec(sql).first()
+        if save is None:
+            raise HTTPException(404)
+        session.delete(save)
+        session.commit()

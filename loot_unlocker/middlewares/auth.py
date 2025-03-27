@@ -5,10 +5,13 @@ from loot_unlocker.models.db import Player, new_session
 from loot_unlocker.utils import salted_passwd_md5
 
 def get_current_player(request: Request):
-    req_player_id = request.headers['x-player-id']
-    req_player_passwd = request.headers['x-player-passwd']
-    req_project_id = request.headers['x-project-id']
-    req_project_version = request.headers['x-project-version']
+    try:
+        req_player_id = request.headers['x-player-id']
+        req_player_passwd = request.headers['x-player-passwd']
+        req_project_id = request.headers['x-project-id']
+        req_project_version = request.headers['x-project-version']
+    except KeyError:
+        raise HTTPException(400, detail="Invalid headers")
 
     with new_session() as session:
         sql = select(Player).where(Player.id == int(req_player_id))

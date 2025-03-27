@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlmodel import select
 
-from loot_unlocker.models.db import Project, new_session
+from loot_unlocker.models import db
 
 router = APIRouter(
     prefix="/api/project",
@@ -18,12 +18,12 @@ class CreateProjectOutput(BaseModel):
 
 @router.post("/")
 async def create_project(params: CreateProjectInput):
-    project = Project(
+    project = db.Project(
         name=params.name,
         description=params.description,
         extras=params.extras,
     )
-    with new_session() as session:
+    with db.new_session() as session:
         session.add(project)
         session.commit()
     return CreateProjectOutput(id=project.id)

@@ -11,7 +11,6 @@ router = APIRouter(
 )
 
 class UploadUgcInput(BaseModel):
-    project_id: int
     type: str
     data: bytes
     extras: dict = {}
@@ -22,7 +21,7 @@ async def upload_ugc(request: Request, params: UploadUgcInput):
     with new_session() as session:
         ugc = Ugc(
             player_id=player.id,
-            project_id=params.project_id,
+            project_id=player.project_id,
             type=params.type,
             data=params.data,
             extras=params.extras
@@ -43,7 +42,7 @@ async def update_ugc(request: Request, ugc_id: int, params: UpdateUgcInput):
         ugc = session.exec(sql).first()
         if ugc is None:
             raise HTTPException(404)
-        if not player.is_admin:
+        if not player.is_ugc_admin:
             if ugc.player_id != player.id:
                 raise HTTPException(403)
         ugc.data = params.data
@@ -59,7 +58,7 @@ async def download_ugc(request: Request, ugc_id: int):
         ugc = session.exec(sql).first()
         if ugc is None:
             raise HTTPException(404)
-        if not player.is_admin:
+        if not player.is_ugc_admin:
             if not ugc.is_public and ugc.player_id != player.id:
                 raise HTTPException(403)
         return ugc
@@ -73,7 +72,7 @@ async def delete_ugc(request: Request, ugc_id: int):
         ugc = session.exec(sql).first()
         if ugc is None:
             raise HTTPException(status_code=404)
-        if not player.is_admin:
+        if not player.is_ugc_admin:
             if ugc.player_id != player.id:
                 raise HTTPException(status_code=403)
         session.delete(ugc)
