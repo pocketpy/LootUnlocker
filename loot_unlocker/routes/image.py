@@ -7,7 +7,8 @@ from loot_unlocker.models import db
 
 router = APIRouter(
     prefix="/api/image",
-    dependencies=[Depends(get_current_player)]
+    dependencies=[Depends(get_current_player)],
+    tags=["Image"],
 )
 
 class UploadImageOutput(BaseModel):

@@ -8,7 +8,8 @@ from loot_unlocker.models import db
 
 router = APIRouter(
     prefix="/api/save",
-    dependencies=[Depends(get_current_player)]
+    dependencies=[Depends(get_current_player)],
+    tags=["Save"],
 )
 
 class UploadSaveInput(BaseModel):

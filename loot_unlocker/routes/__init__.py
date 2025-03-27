@@ -11,12 +11,17 @@ from .ugc import router as ugc_router
 from .version import router as version_router
 
 app = FastAPI(
-    middleware=[CORSMiddleware(
-        allow_origins=["*"],
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )]
-)
+    title="LootUnlocker API",
+    docs_url="/api/docs",
+    )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True,
+    )
 
 app.include_router(file_router)
 app.include_router(image_router)
@@ -25,5 +30,4 @@ app.include_router(player_router)
 app.include_router(project_router)
 app.include_router(save_router)
 app.include_router(ugc_router)
-app.include_router(version_router)
 app.include_router(version_router)

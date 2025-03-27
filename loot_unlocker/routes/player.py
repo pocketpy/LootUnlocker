@@ -6,6 +6,7 @@ from loot_unlocker.utils import random_hex_string, salted_passwd_md5
 
 router = APIRouter(
     prefix="/api/player",
+    tags=["Player"],
 )
 
 class CreatePlayerInput(BaseModel):

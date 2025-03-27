@@ -5,6 +5,7 @@ from loot_unlocker.models import db
 
 router = APIRouter(
     prefix="/api/project",
+    tags=["Project"],
 )
 
 class CreateProjectInput(BaseModel):

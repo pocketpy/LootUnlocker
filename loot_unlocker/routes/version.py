@@ -5,6 +5,7 @@ from loot_unlocker.models import db
 
 router = APIRouter(
     prefix="/api/version",
+    tags=["Version"],
 )
 
 class CreateVersionInput(BaseModel):

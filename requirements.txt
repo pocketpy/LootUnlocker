@@ -3,3 +3,4 @@ psycopg[binary]
 redis
 uvicorn
 sqlmodel
+python-multipart

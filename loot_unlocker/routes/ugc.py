@@ -7,7 +7,8 @@ from loot_unlocker.models.db import Player, Ugc, new_session
 
 router = APIRouter(
     prefix="/api/ugc",
-    dependencies=[Depends(get_current_player)]
+    dependencies=[Depends(get_current_player)],
+    tags=["Ugc"],
 )
 
 class UploadUgcInput(BaseModel):

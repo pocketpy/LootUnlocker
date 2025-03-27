@@ -6,7 +6,8 @@ from loot_unlocker.models import db
 
 router = APIRouter(
     prefix="/api/log",
-    dependencies=[Depends(get_current_player)]
+    dependencies=[Depends(get_current_player)],
+    tags=["Log"],
 )
 
 class UploadLogInputItem(BaseModel):
