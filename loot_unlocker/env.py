@@ -4,10 +4,10 @@ import redis
 from sqlmodel import create_engine
 
 @cache
-def get_sql_engine(tid: int):
-    assert tid > 0
+def get_sql_engine():
     host = os.environ.get("POSTGRES_HOST", "localhost")
-    engine = create_engine(f"postgresql+psycopg://postgres@{host}/loot_unlocker")
+    user = os.environ.get("POSTGRES_USER", "postgres")
+    engine = create_engine(f"postgresql://{user}@{host}/loot_unlocker")
     return engine
 
 def get_redis(db=0, decode_responses=False):

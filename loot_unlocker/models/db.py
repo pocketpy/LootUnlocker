@@ -4,13 +4,7 @@ from sqlalchemy.dialects.postgresql import JSONB, JSON
 
 from loot_unlocker.env import get_sql_engine
 
-from threading import get_ident
-
 ImageToken = str
-
-def new_session():
-    tid = get_ident()
-    return Session(get_sql_engine(tid))
 
 
 class Project(SQLModel, table=True):
@@ -112,6 +106,16 @@ class File(SQLModel, table=True):
 
     player_id: str = Field(foreign_key="player.id")
     created_at: datetime = Field(default_factory=datetime.now)
+
+
+def new_session():
+    return Session(get_sql_engine())
+
+def init_db(drop_old=False):
+    engine = get_sql_engine()
+    if drop_old:
+        SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
 
 
 if __name__ == '__main__':
