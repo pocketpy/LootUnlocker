@@ -20,7 +20,7 @@ class UploadSaveInput(BaseModel):
 async def upload_save(request: Request, params: UploadSaveInput):
     player: db.Player = request.state.player
     with db.new_session() as session:
-        sql = select(db.Save).where(db.Save.key == params.key)
+        sql = select(db.Save).where(db.Save.player_id == player.id, db.Save.key == params.key)
         save = session.exec(sql).first()
         if save is not None:
             # update

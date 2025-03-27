@@ -38,8 +38,7 @@ class UpdateUgcInput(BaseModel):
 async def update_ugc(request: Request, ugc_id: int, params: UpdateUgcInput):
     player: Player = request.state.player
     with new_session() as session:
-        sql = select(Ugc).where(Ugc.id == ugc_id)
-        ugc = session.exec(sql).first()
+        ugc = session.get(Ugc, ugc_id)
         if ugc is None:
             raise HTTPException(404)
         if not player.is_ugc_admin:
@@ -54,8 +53,7 @@ async def update_ugc(request: Request, ugc_id: int, params: UpdateUgcInput):
 async def download_ugc(request: Request, ugc_id: int):
     player: Player = request.state.player
     with new_session() as session:
-        sql = select(Ugc).where(Ugc.id == ugc_id)
-        ugc = session.exec(sql).first()
+        ugc = session.get(Ugc, ugc_id)
         if ugc is None:
             raise HTTPException(404)
         if not player.is_ugc_admin:
@@ -68,8 +66,7 @@ async def download_ugc(request: Request, ugc_id: int):
 async def delete_ugc(request: Request, ugc_id: int):
     player: Player = request.state.player
     with new_session() as session:
-        sql = select(Ugc).where(Ugc.id == ugc_id)
-        ugc = session.exec(sql).first()
+        ugc = session.get(Ugc, ugc_id)
         if ugc is None:
             raise HTTPException(status_code=404)
         if not player.is_ugc_admin:
