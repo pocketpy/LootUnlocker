@@ -1,97 +1,111 @@
 from datetime import datetime
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlalchemy.dialects.postgresql import JSONB, JSON
 
 ImageToken = str
 
-
-class Player(SQLModel, table=True):
-    id: str = Field(primary_key=True)
-    platform: str = Field(index=True)
-    is_admin: bool = Field(default=False)
-    
-    nickname: str | None = Field(index=True, max_length=32, default=None)
-    avatar: ImageToken | None = Field(default=None)
-    access_token: str | None = Field(index=True, default=None)
-    
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
+def new_session():
+    engine = create_engine(...)
+    return Session(engine)
 
 
 class Project(SQLModel, table=True):
-    id: str = Field(primary_key=True)
-    name: str = Field(index=True)
-    description: str = Field(default="")
-    latest_version: int = Field(default=0)
-    
-    logo: ImageToken | None = Field(default=None)
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True, unique=True)
 
+    logo: ImageToken | None = Field(default=None)
+    latest_version: int = Field(default=0)
+
+    description: str = Field(default="")
+    config: dict = Field(default={}, sa_type=JSON)
+    extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
 
 class ProjectVersion(SQLModel, table=True):
-    project_id: str = Field(primary_key=True)
+    project_id: int = Field(foreign_key="project.id", primary_key=True)
     version: int = Field(primary_key=True)
     
-    comment: str = Field(default="")
-    data: str = Field()
-
+    description: str = Field(default="")
+    config: dict = Field(default={}, sa_type=JSON)
+    extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
 
-class CloudSave(SQLModel, table=True):
-    id: str = Field(primary_key=True)
-    data: str = Field()
-    index: int = Field()
+class Player(SQLModel, table=True):
+    project_id: int = Field(foreign_key="project.id", primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
 
-    project_id: str = Field()
-    project_version: int = Field()
-    player_id: str = Field()
+    hash_passwd: str = Field()
+    channel: str = Field(index=True)
+    is_admin: bool = Field(default=False)
+    
+    nickname: str | None = Field(index=True, max_length=32, default=None)
+    avatar: ImageToken | None = Field(default=None)
+
+    project_version: int = Field(default=0)
+    extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
 
-class CloudLog(SQLModel, table=True):
-    id: int = Field(primary_key=True)
-    tags: str = Field()
-    data: str = Field()
+class Save(SQLModel, table=True):
+    player_id: int = Field(foreign_key="player.id", primary_key=True)
+    key: str = Field(primary_key=True)
 
-    project_id: str = Field()
-    project_version: int = Field()
-    player_id: str = Field()
+    data: bytes = Field()
+
+    project_version: int = Field(default=0)
+    extras: dict = Field(default={}, sa_type=JSONB)
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+
+class Log(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    text: str = Field()
+
+    player_id: int = Field(foreign_key="player.id")
+    project_version: int = Field(default=0)
+    extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
 
 
 class Ugc(SQLModel, table=True):
-    id: int = Field(primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     type: str = Field()
-    data: str = Field()
+    data: bytes = Field()
+    is_public: bool = Field(default=False)
 
-    project_id: str = Field()
-    project_version: int = Field()
-    player_id: str = Field()
+    player_id: int = Field(foreign_key="player.id")
+    project_id: int = Field(foreign_key="project.id")
+    project_version: int = Field(default=0)
+    extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
 
 class Image(SQLModel, table=True):
     token: ImageToken = Field(primary_key=True)
-    base64: str = Field()
-    base64_thumbnail: str | None = Field(default=None)
-    project_id: str = Field()
+    data: bytes = Field()
+    data_thumbnail: bytes | None = Field(default=None)
+
+    project_id: str = Field(foreign_key="project.id")
     created_at: datetime = Field(default_factory=datetime.now)
 
 
 class File(SQLModel, table=True):
-    token: str = Field(primary_key=True)
+    token: ImageToken = Field(primary_key=True)
     filename: str = Field()
     size: int = Field()
-    project_id: str = Field()
-    player_id: str = Field()
+
+    project_id: str = Field(foreign_key="project.id")
     created_at: datetime = Field(default_factory=datetime.now)
 
 
 if __name__ == '__main__':
     from sqlalchemy.schema import CreateTable
     from sqlalchemy.dialects import postgresql
-    print(CreateTable(Player.__table__).compile(dialect=postgresql.dialect()))
+    print(CreateTable(Save.__table__).compile(dialect=postgresql.dialect()))
