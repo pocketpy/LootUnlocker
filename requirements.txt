@@ -5,3 +5,4 @@ uvicorn
 sqlmodel
 python-multipart
 requests
+pillow
