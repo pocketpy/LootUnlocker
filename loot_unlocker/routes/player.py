@@ -19,17 +19,17 @@ class CreatePlayerOutput(BaseModel):
     id: int
     passwd: str
 
-@router.post("/")
+@router.post("/", response_model=CreatePlayerOutput)
 async def create_player(params: CreatePlayerInput):
     passwd = random_hex_string(64)
-    player = db.Player(
-        project_id=params.project_id,
-        hash_passwd=salted_passwd_md5(passwd),
-        channel=params.channel,
-        project_version=params.project_version,
-        extras=params.extras,
-    )
     with db.new_session() as session:
+        player = db.Player(
+            hash_passwd=salted_passwd_md5(passwd),
+            channel=params.channel,
+            project_id=params.project_id,
+            project_version=params.project_version,
+            extras=params.extras,
+        )
         session.add(player)
         session.commit()
-    return CreatePlayerOutput(id=player.id, passwd=passwd)
+        return CreatePlayerOutput(id=player.id, passwd=passwd)

@@ -33,16 +33,15 @@ class Version(SQLModel, table=True):
 
 
 class Player(SQLModel, table=True):
-    project_id: int = Field(foreign_key="project.id", primary_key=True)
     id: int | None = Field(default=None, primary_key=True)
 
     hash_passwd: str = Field()
     channel: str = Field(index=True)
-    is_ugc_admin: bool = Field(default=False)
     
     nickname: str | None = Field(index=True, max_length=32, default=None)
     avatar: ImageToken | None = Field(default=None)
 
+    project_id: int = Field(foreign_key="project.id")
     project_version: int = Field(default=0)
     extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
@@ -53,7 +52,7 @@ class Save(SQLModel, table=True):
     player_id: int = Field(foreign_key="player.id", primary_key=True)
     key: str = Field(primary_key=True)
 
-    data: bytes = Field()
+    text: str = Field()
 
     project_version: int = Field(default=0)
     extras: dict = Field(default={}, sa_type=JSONB)
@@ -73,14 +72,15 @@ class Log(SQLModel, table=True):
 
 
 class Ugc(SQLModel, table=True):
-    project_id: int = Field(foreign_key="project.id", primary_key=True)
     id: int | None = Field(default=None, primary_key=True)
 
     type: str = Field()
-    data: bytes = Field()
+    text: str = Field()
+
     is_public: bool = Field(default=False)
 
     player_id: int = Field(foreign_key="player.id")
+    project_id: int = Field(foreign_key="project.id")
     project_version: int = Field(default=0)
     extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
@@ -93,7 +93,7 @@ class Image(SQLModel, table=True):
     data: bytes = Field()
     data_thumbnail: bytes | None = Field(default=None)
 
-    player_id: str = Field(foreign_key="player.id")
+    player_id: int = Field(foreign_key="player.id")
     created_at: datetime = Field(default_factory=datetime.now)
 
 
@@ -104,7 +104,7 @@ class File(SQLModel, table=True):
     size: int = Field()
     filename: str | None = Field(default=None)
 
-    player_id: str = Field(foreign_key="player.id")
+    player_id: int = Field(foreign_key="player.id")
     created_at: datetime = Field(default_factory=datetime.now)
 
 
@@ -117,8 +117,3 @@ def init_db(drop_old=False):
         SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
 
-
-if __name__ == '__main__':
-    from sqlalchemy.schema import CreateTable
-    from sqlalchemy.dialects import postgresql
-    print(CreateTable(Ugc.__table__).compile(dialect=postgresql.dialect()))

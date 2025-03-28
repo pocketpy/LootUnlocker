@@ -7,7 +7,8 @@ from sqlmodel import create_engine
 def get_sql_engine():
     host = os.environ.get("POSTGRES_HOST", "localhost")
     user = os.environ.get("POSTGRES_USER", "postgres")
-    engine = create_engine(f"postgresql://{user}@{host}/loot_unlocker")
+    passwd = os.environ.get("POSTGRES_PASSWD", "postgres")
+    engine = create_engine(f"postgresql+psycopg://{user}:{passwd}@{host}/loot_unlocker")
     return engine
 
 def get_redis(db=0, decode_responses=False):

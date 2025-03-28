@@ -4,3 +4,4 @@ redis
 uvicorn
 sqlmodel
 python-multipart
+requests
