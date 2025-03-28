@@ -1,11 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, Depends
 from pydantic import BaseModel
 
 from loot_unlocker.models import db
+from loot_unlocker.middlewares import get_admin_username
 
 router = APIRouter(
-    prefix="/api/version",
-    tags=["Version"],
+    prefix="/api/admin/version",
+    tags=["Admin"],
+    dependencies=[Depends(get_admin_username)],
 )
 
 class CreateVersionInput(BaseModel):
@@ -21,6 +23,3 @@ async def create_version(params: CreateVersionInput):
     with db.new_session() as session:
         session.add(version)
         session.commit()
-
-
-

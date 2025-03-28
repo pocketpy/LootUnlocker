@@ -7,6 +7,14 @@ from loot_unlocker.env import get_sql_engine
 ImageToken = str
 
 
+class Admin(SQLModel, table=True):
+    username: str = Field(primary_key=True)
+    hash_passwd: str = Field()
+
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+
 class Project(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)

@@ -2,7 +2,7 @@ from fastapi import HTTPException, Request
 from sqlmodel import select
 
 from loot_unlocker.models.db import Player, new_session
-from loot_unlocker.utils import salted_passwd_md5
+from loot_unlocker.utils import hash_passwd
 
 def get_current_player(request: Request):
     try:
@@ -15,8 +15,8 @@ def get_current_player(request: Request):
 
     with new_session() as session:
         player = session.get(Player, req_player_id)
-        if player is None or player.hash_passwd != salted_passwd_md5(req_player_passwd):
-            raise HTTPException(401, detail="Invalid player id or password")
+        if player is None or player.hash_passwd != hash_passwd(req_player_passwd):
+            raise HTTPException(401, detail="Invalid player id or passwd")
         if player.project_id != req_project_id:
             raise HTTPException(403, detail="Mismatched project id")
         if req_project_version != player.project_version:

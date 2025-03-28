@@ -1,5 +1,6 @@
 import random
 import hashlib
+import uuid
 
 class Version:
     def __init__(self, major: int, minor: int, patch: int):
@@ -29,5 +30,9 @@ class Version:
 def random_hex_string(length: int):
     return ''.join(random.choices('0123456789abcdef', k=length))
 
-def salted_passwd_md5(password: str):
-    return hashlib.md5((password + 'zhs6282').encode()).hexdigest()
+def random_passwd():
+    prefix = random_hex_string(32)
+    return prefix + '-' + uuid.uuid4().hex
+
+def hash_passwd(passwd: str):
+    return hashlib.sha256((passwd + 'zhs6282').encode()).hexdigest()

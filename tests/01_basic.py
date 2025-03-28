@@ -3,10 +3,17 @@ import requests
 root_url = 'http://localhost:6282/api'
 
 print('Creating a new project')
-resp = requests.post(f'{root_url}/project', json={
+
+with open('tests/admin_passwd.txt', 'r') as f:
+    admin_passwd = f.read().strip()
+
+resp = requests.post(f'{root_url}/admin/project', json={
     "name": "brogue-rpg",
     "description": "A Ticket to the Past of RPG2 World",
     "extras": {}
+    }, headers={
+    'x-admin-username': 'admin',
+    'x-admin-passwd': admin_passwd
     })
 assert (resp.status_code == 200), resp.text
 

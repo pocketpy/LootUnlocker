@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from loot_unlocker.models import db
-from loot_unlocker.utils import random_hex_string, salted_passwd_md5
+from loot_unlocker.utils import hash_passwd, random_passwd
 
 router = APIRouter(
     prefix="/api/player",
@@ -21,10 +21,10 @@ class CreatePlayerOutput(BaseModel):
 
 @router.post("/", response_model=CreatePlayerOutput)
 async def create_player(params: CreatePlayerInput):
-    passwd = random_hex_string(64)
+    passwd = random_passwd()
     with db.new_session() as session:
         player = db.Player(
-            hash_passwd=salted_passwd_md5(passwd),
+            hash_passwd=hash_passwd(passwd),
             channel=params.channel,
             project_id=params.project_id,
             project_version=params.project_version,
