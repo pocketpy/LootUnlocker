@@ -17,7 +17,7 @@ class UploadImageOutput(BaseModel):
     token: str
 
 @router.post("/", response_model=UploadImageOutput)
-async def upload_image(request: Request):
+async def upload_image(request: Request, max_width: int = 1024, max_height: int = 1024):
     player: db.Player = request.state.player
     token = uuid.uuid4().hex
     try:
@@ -25,18 +25,17 @@ async def upload_image(request: Request):
     except:
         raise HTTPException(400)
     
-    MAX_WH = 1024
-    if pil_image.width > MAX_WH or pil_image.height > MAX_WH:
-        # resize image keeping aspect ratio
-        aspect_ratio = pil_image.width / pil_image.height
-        if pil_image.width > pil_image.height:
-            new_width = MAX_WH
-            new_height = int(new_width / aspect_ratio)
-        else:
-            new_height = MAX_WH
-            new_width = int(new_height * aspect_ratio)
+    aspect_ratio = pil_image.width / pil_image.height
+    if pil_image.width > max_width:
+        new_width = max_width
+        new_height = int(new_width / aspect_ratio)
         pil_image = pil_image.resize((new_width, new_height))
 
+    if pil_image.height > max_height:
+        new_height = max_height
+        new_width = int(new_height * aspect_ratio)
+        pil_image = pil_image.resize((new_width, new_height))
+    
     data = BytesIO()
     pil_image.save(data, format="PNG")
     

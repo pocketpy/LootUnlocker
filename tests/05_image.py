@@ -23,7 +23,7 @@ sample_jpg_image = Image.new('RGB', (500, 100))
 data = BytesIO()
 sample_jpg_image.save(data, 'JPEG')
 
-resp = requests.post(f'{root_url}/image', headers=headers, data=data.getvalue())
+resp = requests.post(f'{root_url}/image?max_width=100', headers=headers, data=data.getvalue())
 assert (resp.status_code == 200), resp.text
 image_token = resp.json()['token']
 
@@ -33,4 +33,4 @@ resp = requests.get(f'{root_url}/image/{image_token}', headers=headers)
 assert resp.status_code == 200
 
 new_image = Image.open(BytesIO(resp.content))
-assert new_image.size == (500, 100)
+assert new_image.size == (100, 20)
