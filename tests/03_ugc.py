@@ -33,7 +33,6 @@ assert (resp.status_code == 200), resp.text
 print(resp.json())
 assert (resp.json()['text'] == 'Hello, World!')
 
-
 # update ugc
 print('Updating a ugc')
 resp = requests.put(f'{root_url}/ugc/{ugc_id}', headers=headers, json={
@@ -48,6 +47,15 @@ resp = requests.get(f'{root_url}/ugc', headers=headers)
 assert (resp.status_code == 200), resp.text
 
 print(resp.json())
-assert len(resp.json()['items']) == 1
-assert resp.json()['items'][0]['text'] == 'Hello, World! Updated'
+items = resp.json()['items']
+assert len(items) == 1
+assert items[0]['text'] == 'Hello, World! Updated'
 
+# delete ugc
+print('Deleting a ugc')
+ugc_id = items[0]['id']
+resp = requests.delete(f'{root_url}/ugc/{ugc_id}', headers=headers)
+assert (resp.status_code == 200), resp.text
+
+resp = requests.delete(f'{root_url}/ugc/3333', headers=headers)
+assert (resp.status_code == 404)
