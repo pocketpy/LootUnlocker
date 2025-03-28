@@ -5,24 +5,13 @@ print(os.getcwd())
 sys.path.append(os.getcwd())
 
 from loot_unlocker.models import db
-from loot_unlocker.utils import hash_passwd, random_passwd
 
-db.init_db(drop_old=True)
+admin = db.init_db()
 
-# insert a default admin user
-passwd = random_passwd()
-with db.new_session() as session:
-    admin = db.Admin(
-        username='admin',
-        hash_passwd=hash_passwd(passwd),
-    )
-    session.add(admin)
-    session.commit()
-
-    print('username:', admin.username)
-    print('passwd', passwd)
+print('admin.username:', admin[0])
+print('admin.password:', admin[1])
 
 print('Database initialized')
 
 with open('tests/admin_passwd.txt', 'w') as f:
-    f.write(passwd)
+    f.write(admin[1])

@@ -120,9 +120,21 @@ class File(SQLModel, table=True):
 def new_session():
     return Session(get_sql_engine())
 
-def init_db(drop_old=False):
+def init_db(drop_old=True):
     engine = get_sql_engine()
     if drop_old:
         SQLModel.metadata.drop_all(engine)
     SQLModel.metadata.create_all(engine)
+
+    from loot_unlocker.utils import hash_passwd, random_passwd
+    passwd = random_passwd()
+    with new_session() as session:
+        admin = Admin(
+            username='admin',
+            hash_passwd=hash_passwd(passwd),
+        )
+        session.add(admin)
+        session.commit()
+
+        return 'admin', passwd
 

@@ -27,11 +27,11 @@ class Version:
         return Version(major, minor, patch)
     
 
-def random_hex_string(length: int):
-    return ''.join(random.choices('0123456789abcdef', k=length))
+def random_number(length: int):
+    return ''.join(random.choices('0123456789', k=length))
 
 def random_passwd():
-    prefix = random_hex_string(32)
+    prefix = random_number(16)
     return prefix + '-' + uuid.uuid4().hex
 
 def hash_passwd(passwd: str):
