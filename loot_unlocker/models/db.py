@@ -91,7 +91,8 @@ class Image(SQLModel, table=True):
     token: ImageToken = Field(primary_key=True)
     
     data: bytes = Field()
-    data_thumbnail: bytes | None = Field(default=None)
+    width: int = Field()
+    height: int = Field()
 
     player_id: int = Field(foreign_key="player.id")
     created_at: datetime = Field(default_factory=datetime.now)
