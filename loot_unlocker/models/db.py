@@ -11,6 +11,9 @@ class Admin(SQLModel, table=True):
     username: str = Field(primary_key=True)
     hash_passwd: str = Field()
 
+    nickname: str | None = Field(index=True, max_length=32, default=None)
+    avatar: ImageToken | None = Field(default=None)
+
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
 
