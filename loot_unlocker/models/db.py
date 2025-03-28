@@ -61,11 +61,11 @@ class Save(SQLModel, table=True):
 
 
 class Log(SQLModel, table=True):
-    player_id: int = Field(foreign_key="player.id", primary_key=True)
     id: int | None = Field(default=None, primary_key=True)
 
     text: str = Field()
 
+    player_id: int = Field(foreign_key="player.id")
     project_version: int = Field(default=0)
     extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)
@@ -74,13 +74,13 @@ class Log(SQLModel, table=True):
 class Ugc(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
-    type: str = Field()
+    type: str = Field(index=True)
     text: str = Field()
+    project_id: int = Field(foreign_key="project.id", index=True)
 
     is_public: bool = Field(default=False)
 
     player_id: int = Field(foreign_key="player.id")
-    project_id: int = Field(foreign_key="project.id")
     project_version: int = Field(default=0)
     extras: dict = Field(default={}, sa_type=JSONB)
     created_at: datetime = Field(default_factory=datetime.now)

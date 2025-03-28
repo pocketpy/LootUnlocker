@@ -26,8 +26,8 @@ async def upload_ugc(request: Request, params: UploadUgcInput):
         ugc = Ugc(
             type=params.type,
             text=params.text,
-            player_id=player.id,
             project_id=player.project_id,
+            player_id=player.id,
             project_version=player.project_version,
             extras=params.extras
         )
