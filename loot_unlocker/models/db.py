@@ -74,6 +74,7 @@ class Save(SQLModel, table=True):
 class Log(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
+    level: int = Field()
     text: str = Field()
 
     player_id: int = Field(foreign_key="player.id")

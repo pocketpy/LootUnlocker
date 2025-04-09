@@ -11,6 +11,7 @@ router = APIRouter(
 )
 
 class UploadLogInputItem(BaseModel):
+    level: int
     text: str
     extras: dict = {}
 
@@ -24,6 +25,7 @@ async def upload_log(request: Request, params: UploadLogInputItem):
     with db.new_session() as session:
         log = db.Log(
             player_id=player.id,
+            level=params.level,
             text=params.text,
             project_version=player.project_version,
             extras=params.extras
@@ -39,6 +41,7 @@ async def upload_log_batch(request: Request, params: UploadLogInput):
         for item in params.items:
             log = db.Log(
                 player_id=player.id,
+                level=item.level,
                 text=item.text,
                 project_version=player.project_version,
                 extras=item.extras
